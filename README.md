@@ -1,33 +1,58 @@
-## Discourse MCP
+## GitLab Forum MCP
 
-A Model Context Protocol (MCP) stdio server that exposes Discourse forum capabilities as tools for AI agents.
+A Model Context Protocol (MCP) stdio server specifically configured for GitLab forum troubleshooting and support. This is a specialized fork of [discourse-mcp](https://github.com/discourse/discourse-mcp) optimized for https://forum.gitlab.com.
+
+**Perfect for GitLab users and support teams** who need to quickly search, read, and analyze discussions on GitLab's community forum for troubleshooting CI/CD issues, GitLab features, and community support.
+
+### GitLab-Specific Features
+- 🎯 **Pre-configured for GitLab forum** (https://forum.gitlab.com)
+- 🔍 **Smart default searches** - focuses on help category and latest posts
+- ⚡ **Optimized workflows** for GitLab troubleshooting scenarios
+- 📁 **Ready-to-use profile** - just clone and run
+- 🏷️ **GitLab-focused search filters** for common support topics
 
 - **Entry point**: `src/index.ts` → compiled to `dist/index.js` (binary name: `discourse-mcp`)
 - **SDK**: `@modelcontextprotocol/sdk`
 - **Node**: >= 18
 
-### Quick start (release)
+### Quick start for GitLab forum
 
-- **Run (read‑only, recommended to start)**
+- **Run with GitLab forum profile (recommended)**
 ```bash
-npx -y @discourse/mcp@latest
+npx -y @discourse/mcp@latest --profile gitlab-forum-profile.json
 ```
-Then, in your MCP client, either:
-- Call the `discourse_select_site` tool with `{ "site": "https://try.discourse.org" }` to choose a site, or
-- Start the server tethered to a site using `--site https://try.discourse.org` (in which case `discourse_select_site` is hidden).
+This automatically connects to https://forum.gitlab.com with GitLab-optimized search defaults.
 
-- **Enable writes (opt‑in, safe‑guarded)**
+- **Alternative: Run with site parameter**
 ```bash
-npx -y @discourse/mcp@latest --allow_writes --read_only=false --auth_pairs '[{"site":"https://try.discourse.org","api_key":"'$DISCOURSE_API_KEY'","api_username":"system"}]'
+npx -y @discourse/mcp@latest --site https://forum.gitlab.com
 ```
 
-- **Use in an MCP client (example: Claude Desktop) — via npx**
+- **Enable writes for GitLab forum (opt‑in, requires API key)**
+```bash
+npx -y @discourse/mcp@latest --profile gitlab-forum-profile.json --allow_writes --read_only=false --auth_pairs '[{"site":"https://forum.gitlab.com","api_key":"'$GITLAB_FORUM_API_KEY'","api_username":"your_username"}]'
+```
+
+- **Use in an MCP client (example: Claude Desktop)**
 ```json
 {
   "mcpServers": {
-    "discourse": {
+    "gitlab-forum": {
       "command": "npx",
-      "args": ["-y", "@discourse/mcp@latest"],
+      "args": ["-y", "@discourse/mcp@latest", "--site", "https://forum.gitlab.com"],
+      "env": {}
+    }
+  }
+}
+```
+
+Or with the profile configuration:
+```json
+{
+  "mcpServers": {
+    "gitlab-forum": {
+      "command": "npx",
+      "args": ["-y", "@discourse/mcp@latest", "--profile", "/path/to/gitlab-forum-profile.json"],
       "env": {}
     }
   }
