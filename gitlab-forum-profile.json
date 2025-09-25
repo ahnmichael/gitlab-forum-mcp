@@ -1,0 +1,9 @@
+{
+  "site": "https://forum.gitlab.com",
+  "log_level": "info",
+  "tools_mode": "auto",
+  "default_search": "category:help order:latest-post",
+  "max_read_length": 50000,
+  "read_only": true,
+  "allow_writes": false
+}
