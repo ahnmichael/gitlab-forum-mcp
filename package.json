@@ -1,6 +1,6 @@
 {
   "name": "@ahnmichael/gitlab-forum-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "GitLab Forum MCP server with search fixes and GitLab-optimized configuration",
   "private": false,
   "type": "module",
@@ -11,7 +11,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "prepublishOnly": "pnpm run build",
+    "prepublishOnly": "npm run build",
     "dev": "node --enable-source-maps dist/index.js",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
