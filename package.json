@@ -1,11 +1,11 @@
 {
-  "name": "@discourse/mcp",
-  "version": "0.1.3",
-  "description": "Discourse MCP CLI server (stdio) exposing Discourse tools via MCP",
+  "name": "@ahnmichael/gitlab-forum-mcp",
+  "version": "0.1.0",
+  "description": "GitLab Forum MCP server with search fixes and GitLab-optimized configuration",
   "private": false,
   "type": "module",
   "bin": {
-    "discourse-mcp": "dist/index.js"
+    "gitlab-forum-mcp": "dist/index.js"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

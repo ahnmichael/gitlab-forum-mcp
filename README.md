@@ -1,5 +1,7 @@
 ## GitLab Forum MCP
 
+⚠️ **This is an unofficial, community-created MCP** - not affiliated with or endorsed by GitLab Inc.
+
 A Model Context Protocol (MCP) stdio server specifically configured for GitLab forum troubleshooting and support. This is a specialized fork of [discourse-mcp](https://github.com/discourse/discourse-mcp) optimized for https://forum.gitlab.com.
 
 **Perfect for GitLab users and support teams** who need to quickly search, read, and analyze discussions on GitLab's community forum for troubleshooting CI/CD issues, GitLab features, and community support.
@@ -19,18 +21,18 @@ A Model Context Protocol (MCP) stdio server specifically configured for GitLab f
 
 - **Run with GitLab forum profile (recommended)**
 ```bash
-npx -y @discourse/mcp@latest --profile gitlab-forum-profile.json
+npx -y @ahnmichael/gitlab-forum-mcp@latest --profile gitlab-forum-profile.json
 ```
-This automatically connects to https://forum.gitlab.com with GitLab-optimized search defaults.
+This automatically connects to https://forum.gitlab.com with GitLab-optimized search defaults and enhanced search fixes.
 
 - **Alternative: Run with site parameter**
 ```bash
-npx -y @discourse/mcp@latest --site https://forum.gitlab.com
+npx -y @ahnmichael/gitlab-forum-mcp@latest --site https://forum.gitlab.com
 ```
 
 - **Enable writes for GitLab forum (opt‑in, requires API key)**
 ```bash
-npx -y @discourse/mcp@latest --profile gitlab-forum-profile.json --allow_writes --read_only=false --auth_pairs '[{"site":"https://forum.gitlab.com","api_key":"'$GITLAB_FORUM_API_KEY'","api_username":"your_username"}]'
+npx -y @ahnmichael/gitlab-forum-mcp@latest --profile gitlab-forum-profile.json --allow_writes --read_only=false --auth_pairs '[{"site":"https://forum.gitlab.com","api_key":"'$GITLAB_FORUM_API_KEY'","api_username":"your_username"}]'
 ```
 
 - **Use in an MCP client (example: Claude Desktop)**
@@ -39,7 +41,7 @@ npx -y @discourse/mcp@latest --profile gitlab-forum-profile.json --allow_writes 
   "mcpServers": {
     "gitlab-forum": {
       "command": "npx",
-      "args": ["-y", "@discourse/mcp@latest", "--site", "https://forum.gitlab.com"],
+      "args": ["-y", "@ahnmichael/gitlab-forum-mcp@latest", "--site", "https://forum.gitlab.com"],
       "env": {}
     }
   }
@@ -52,18 +54,18 @@ Or with the profile configuration:
   "mcpServers": {
     "gitlab-forum": {
       "command": "npx",
-      "args": ["-y", "@discourse/mcp@latest", "--profile", "/path/to/gitlab-forum-profile.json"],
+      "args": ["-y", "@ahnmichael/gitlab-forum-mcp@latest", "--profile", "/path/to/gitlab-forum-profile.json"],
       "env": {}
     }
   }
 }
 ```
 
-> Alternative: if you prefer a global binary after install, the package exposes `discourse-mcp`.
+> Alternative: if you prefer a global binary after install, the package exposes `gitlab-forum-mcp`.
 > ```json
 > {
 >   "mcpServers": {
->     "discourse": { "command": "discourse-mcp", "args": [] }
+>     "gitlab-forum": { "command": "gitlab-forum-mcp", "args": [] }
 >   }
 > }
 > ```

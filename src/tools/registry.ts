@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Logger } from "../util/logger.js";
 import type { SiteState } from "../site/state.js";
-import { registerSearch } from "./builtin/search.js";
+import { registerSearch } from "./builtin/search-fixed.js";
 import { registerReadTopic } from "./builtin/read_topic.js";
 import { registerReadPost } from "./builtin/read_post.js";
 import { registerListCategories } from "./builtin/list_categories.js";
