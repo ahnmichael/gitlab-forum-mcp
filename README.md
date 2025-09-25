@@ -8,41 +8,35 @@ A Model Context Protocol (MCP) stdio server specifically configured for GitLab f
 
 ### GitLab-Specific Features
 - 🎯 **Pre-configured for GitLab forum** (https://forum.gitlab.com)
-- 🔍 **Smart default searches** - focuses on help category and latest posts
+- 🔍 **Enhanced search with GitLab compatibility fixes** - improved error handling and debug logging
 - ⚡ **Optimized workflows** for GitLab troubleshooting scenarios
 - 📁 **Ready-to-use profile** - just clone and run
-- 🏷️ **GitLab-focused search filters** for common support topics
+- 🏷️ **GitLab-focused configuration** for common support topics
 
-- **Entry point**: `src/index.ts` → compiled to `dist/index.js` (binary name: `discourse-mcp`)
-- **SDK**: `@modelcontextprotocol/sdk`
-- **Node**: >= 18
+## Quick Start
 
-### Quick start for GitLab forum
+### Command Line Usage
 
-- **Run with GitLab forum profile (recommended)**
+**Recommended: Run with GitLab forum profile**
 ```bash
 npx -y @ahnmichael/gitlab-forum-mcp@latest --profile gitlab-forum-profile.json
 ```
-This automatically connects to https://forum.gitlab.com with GitLab-optimized search defaults and enhanced search fixes.
 
-- **Alternative: Run with site parameter**
+**Alternative: Run with site parameter**
 ```bash
 npx -y @ahnmichael/gitlab-forum-mcp@latest --site https://forum.gitlab.com
 ```
 
-- **Enable writes for GitLab forum (opt‑in, requires API key)**
-```bash
-npx -y @ahnmichael/gitlab-forum-mcp@latest --profile gitlab-forum-profile.json --allow_writes --read_only=false --auth_pairs '[{"site":"https://forum.gitlab.com","api_key":"'$GITLAB_FORUM_API_KEY'","api_username":"your_username"}]'
-```
+### Use in Claude Desktop
 
-- **Use in an MCP client (example: Claude Desktop)**
+Add to your `claude_desktop_config.json`:
+
 ```json
 {
   "mcpServers": {
     "gitlab-forum": {
       "command": "npx",
-      "args": ["-y", "@ahnmichael/gitlab-forum-mcp@latest", "--site", "https://forum.gitlab.com"],
-      "env": {}
+      "args": ["-y", "@ahnmichael/gitlab-forum-mcp@latest", "--site", "https://forum.gitlab.com"]
     }
   }
 }
@@ -54,195 +48,53 @@ Or with the profile configuration:
   "mcpServers": {
     "gitlab-forum": {
       "command": "npx",
-      "args": ["-y", "@ahnmichael/gitlab-forum-mcp@latest", "--profile", "/path/to/gitlab-forum-profile.json"],
-      "env": {}
+      "args": ["-y", "@ahnmichael/gitlab-forum-mcp@latest", "--profile", "/path/to/gitlab-forum-profile.json"]
     }
   }
 }
 ```
 
-> Alternative: if you prefer a global binary after install, the package exposes `gitlab-forum-mcp`.
-> ```json
-> {
->   "mcpServers": {
->     "gitlab-forum": { "command": "gitlab-forum-mcp", "args": [] }
->   }
-> }
-> ```
+## Available Tools
 
-## Configuration
+- **discourse_search** - Search GitLab forum discussions
+- **discourse_read_topic** - Read full topic threads
+- **discourse_read_post** - Read individual posts
+- **discourse_list_categories** - Browse forum categories
+- **discourse_list_tags** - Browse available tags
+- **discourse_get_user** - Get user information
+- **discourse_filter_topics** - Filter topics by various criteria
 
-The server registers tools under the MCP server name `@discourse/mcp`. Choose a target Discourse site either by:
-- Using the `discourse_select_site` tool at runtime (validates via `/about.json`), or
-- Supplying `--site <url>` to tether the server to a single site at startup (validates via `/about.json` and hides `discourse_select_site`).
+## Getting the Profile File
 
-- **Auth**
-  - **None** by default.
-  - **`--auth_pairs '[{"site":"https://example.com","api_key":"...","api_username":"system"}]'`**: Per‑site API key overrides. You can include multiple entries; the matching entry is used for the selected site.
+1. **Clone this repository:**
+   ```bash
+   git clone https://github.com/ahnmichael/gitlab-forum-mcp.git
+   cd gitlab-forum-mcp
+   ```
 
-- **Write safety**
-  - Writes are disabled by default.
-  - The tools `discourse_create_post`, `discourse_create_topic`, `discourse_create_category`, and `discourse_create_user` are only registered when all are true:
-    - `--allow_writes` AND not `--read_only` AND some auth is configured (either default flags or a matching `auth_pairs` entry).
-  - A ~1 req/sec rate limit is enforced for write actions.
+2. **Use the profile file:**
+   ```bash
+   npx -y @ahnmichael/gitlab-forum-mcp@latest --profile gitlab-forum-profile.json
+   ```
 
-- **Flags & defaults**
-  - `--read_only` (default: true)
-  - `--allow_writes` (default: false)
-  - `--timeout_ms <number>` (default: 15000)
-  - `--concurrency <number>` (default: 4)
-  - `--log_level <silent|error|info|debug>` (default: info)
-  - `--tools_mode <auto|discourse_api_only|tool_exec_api>` (default: auto)
-  - `--site <url>`: Tether MCP to a single site and hide `discourse_select_site`.
-  - `--default-search <prefix>`: Unconditionally prefix every search query (e.g., `tag:ai order:latest-post`).
-  - `--max-read-length <number>`: Maximum characters returned for post content (default 50000). Applies to `discourse_read_post` and per-post content in `discourse_read_topic`. The tools prefer `raw` content by requesting `include_raw=true`.
-  - `--cache_dir <path>` (reserved)
-  - `--profile <path.json>` (see below)
+## Requirements
 
-- **Profile file** (keep secrets off the command line)
-```json
-{
-  "auth_pairs": [
-    { "site": "https://try.discourse.org", "api_key": "<redacted>", "api_username": "system" }
-  ],
-  "read_only": false,
-  "allow_writes": true,
-  "log_level": "info",
-  "tools_mode": "auto",
-  "site": "https://try.discourse.org"
-  ,
-  "default_search": "tag:ai order:latest-post"
-  ,
-  "max_read_length": 50000
-}
-```
-Run with:
-```bash
-node dist/index.js --profile /absolute/path/to/profile.json
-```
-Flags still override values from the profile.
+- **Node.js**: >= 18
+- **Internet connection** to access GitLab forum
 
-- **Remote Tool Execution API (optional)**
-  - With `tools_mode=auto` (default) or `tool_exec_api`, the server discovers remote tools via GET `/ai/tools` after you select a site (or immediately at startup if `--site` is provided) and registers them dynamically. Set `--tools_mode=discourse_api_only` to disable remote tool discovery.
+## Contributing
 
-- **Networking & resilience**
-  - Retries on 429/5xx with backoff (3 attempts).
-  - Lightweight in‑memory GET cache for selected endpoints.
+This is a specialized fork of [discourse-mcp](https://github.com/discourse/discourse-mcp) for GitLab forum usage.
 
-- **Privacy**
-  - Secrets are redacted in logs. Errors are returned as human‑readable messages to MCP clients.
+- **Report issues**: [GitHub Issues](https://github.com/ahnmichael/gitlab-forum-mcp/issues)
+- **Source code**: Built with Node.js and TypeScript
+- **Contributing**: PRs welcome for GitLab-specific improvements
 
-## Tools
+## License
 
-Built‑in tools (always present unless noted):
+MIT License - see [LICENSE](LICENSE) file for details.
 
-- `discourse_search`
-  - Input: `{ query: string; with_private?: boolean; max_results?: number (1–50, default 10) }`
-  - Output: text summary plus a compact footer like:
-    ```json
-    { "results": [{ "id": 123, "url": "https://…", "title": "…" }] }
-    ```
-- `discourse_read_topic`
-  - Input: `{ topic_id: number; post_limit?: number (1–20, default 5) }`
-- `discourse_read_post`
-  - Input: `{ post_id: number }`
-- `discourse_list_categories`
-  - Input: `{}`
-- `discourse_list_tags`
-  - Input: `{}`
-- `discourse_get_user`
-  - Input: `{ username: string }`
-- `discourse_filter_topics`
-  - Input: `{ filter: string; page?: number (default 1); per_page?: number (1–50) }`
-  - Query language (succinct): key:value tokens separated by spaces; category/categories (comma = OR, `=category` = without subcats, `-` prefix = exclude); tag/tags (comma = OR, `+` = AND) and tag_group; status:(open|closed|archived|listed|unlisted|public); personal `in:` (bookmarked|watching|tracking|muted|pinned); dates: created/activity/latest-post-(before|after) with `YYYY-MM-DD` or relative days `N`; numeric: likes[-op]-(min|max), posts-(min|max), posters-(min|max), views-(min|max); order: activity|created|latest-post|likes|likes-op|posters|title|views|category with optional `-asc`; free text terms are matched.
-- `discourse_create_post` (only when writes enabled; see Write safety)
-  - Input: `{ topic_id: number; raw: string (≤ 30k chars) }`
+## Acknowledgments
 
-- `discourse_create_topic` (only when writes enabled; see Write safety)
-  - Input: `{ title: string; raw: string (≤ 30k chars); category_id?: number; tags?: string[] }`
-
- - `discourse_create_user` (only when writes enabled; see Write safety)
- - Input: `{ username: string (1-20 chars); email: string; name: string; password: string; active?: boolean; approved?: boolean }`
-
- - `discourse_create_category` (only when writes enabled; see Write safety)
- - Input: `{ name: string; color?: hex; text_color?: hex; parent_category_id?: number; description?: string }`
-
-
-Notes:
-- Outputs are human‑readable first. Where applicable, a compact JSON is embedded in fenced code blocks to ease structured extraction by agents.
-
-## Development
-
-- **Requirements**: Node >= 18, `pnpm`.
-
-- **Install / Build / Typecheck / Test**
-```bash
-pnpm install
-pnpm typecheck
-pnpm build
-pnpm test
-```
-
-- **Run locally (with source maps)**
-```bash
-pnpm build && pnpm dev
-```
-
-- **Project layout**
-  - Server & CLI: `src/index.ts`
-  - HTTP client: `src/http/client.ts`
-  - Tool registry: `src/tools/registry.ts`
-  - Built‑in tools: `src/tools/builtin/*`
-  - Remote tools: `src/tools/remote/tool_exec_api.ts`
-  - Logging/redaction: `src/util/logger.ts`, `src/util/redact.ts`
-
-- **Testing notes**
-  - Tests run with Node’s test runner against compiled artifacts (`dist/test/**/*.js`). Ensure `pnpm build` before `pnpm test` if invoking scripts individually.
-
-- **Publishing (optional)**
-  - The package is published as `@discourse/mcp` and exposes a `bin` named `discourse-mcp`. Prefer `npx @discourse/mcp@latest` for frictionless usage.
-
-- **Conventions**
-  - Focus on text‑oriented outputs; keep embedded JSON concise.
-  - Be careful with write operations; keep them opt‑in and rate‑limited.
-
-See `AGENTS.md` for additional guidance on using this server from agent frameworks.
-
-## Examples
-
-- Read‑only session against `try.discourse.org`:
-```bash
-npx -y @discourse/mcp@latest --log_level debug
-# In client: call discourse_select_site with {"site":"https://try.discourse.org"}
-```
-
-- Tether to a single site:
-```bash
-npx -y @discourse/mcp@latest --site https://try.discourse.org
-```
-
-- Create a post (writes enabled):
-```bash
-npx -y @discourse/mcp@latest --allow_writes --read_only=false --auth_pairs '[{"site":"https://try.discourse.org","api_key":"'$DISCOURSE_API_KEY'","api_username":"system"}]'
-```
-
-- Create a category (writes enabled):
-```bash
-npx -y @discourse/mcp@latest --allow_writes --read_only=false --auth_pairs '[{"site":"https://try.discourse.org","api_key":"'$DISCOURSE_API_KEY'","api_username":"system"}]'
-# In your MCP client, call discourse_create_category with for example:
-# { "name": "AI Research", "color": "0088CC", "text_color": "FFFFFF", "description": "Discussions about AI research" }
-```
-
-- Create a topic (writes enabled):
-```bash
-npx -y @discourse/mcp@latest --allow_writes --read_only=false --auth_pairs '[{"site":"https://try.discourse.org","api_key":"'$DISCOURSE_API_KEY'","api_username":"system"}]'
-# In your MCP client, call discourse_create_topic, for example:
-# { "title": "Agentic workflows", "raw": "Let’s discuss agent workflows.", "category_id": 1, "tags": ["ai","agents"] }
-```
-
-## FAQ
-
-- **Why is `create_post` missing?** You’re in read‑only mode. Enable writes as described above.
-- **Can I disable remote tool discovery?** Yes, run with `--tools_mode=discourse_api_only`.
-- **Can I avoid exposing `discourse_select_site`?** Yes, start with `--site <url>` to tether to a single site.
-- **Time outs or rate limits?** Increase `--timeout_ms`, and note built‑in retry/backoff on 429/5xx.
+- Original [discourse-mcp](https://github.com/discourse/discourse-mcp) project by Discourse
+- Enhanced search functionality developed through Claude Desktop testing
